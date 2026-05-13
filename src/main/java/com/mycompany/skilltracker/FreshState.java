@@ -15,8 +15,10 @@ public class FreshState implements SkillState{
     // if score less than 60 then next state which is starting to fade
     @Override
     public void evaluate(Skill skill) {
-        if (skill.getScore() < 60)
+        if (skill.getScore() > 25 && skill.getScore() < 60)
             skill.setState(new FadingState());
+        else if (skill.getScore() < 25)
+            skill.setState(new OutdatedState());
     }
  
     @Override

@@ -11,8 +11,12 @@ package com.mycompany.skilltracker;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-// Context class for state design pattern
-// state is what is being tracked and computed
+// Context class for STATE design pattern
+// holds reference to STATE, what is being tracked and computed
+
+// +
+
+// use STRATEGY pattern to compute score using the selected decay strategy
 public class Skill {
     
     private String name;
@@ -40,13 +44,14 @@ public class Skill {
         recomputeScore();
     }
  
-    // Recompute score using the current strategy selectes, then let the state evaluate
+    // Recompute score using the current STRATEGY selectes, then let the state evaluate
     public void recomputeScore() {
         this.score = evaluatorContext.computeScore(lastUsed, usageCount);
+        // evaluate fresh, fading, outdated based on score calculated
         state.evaluate(this);
     }
  
-    // Called by concrete states to transition the states
+    // Called by concrete STATES to transition the states
     public void setState(SkillState newState) {
         this.state = newState;
     }

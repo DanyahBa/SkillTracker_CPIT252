@@ -11,13 +11,17 @@ package com.mycompany.skilltracker;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class FrameUI extends JFrame{
     
-    // store list of skills
-    private List<Skill> skills = new ArrayList<>();
+    // SUBJECT is storing skills and notifies observers when changes happen
+    private Subject tracker       = new Subject();
+    
+    // this OBSERVER counts how many skills are fresh, fading, outdated and updats when SUBJECT notifies 
+    private SummaryObserver summary;
+    
+    // this OBSERVER shows a warning when SUBJECT notifies change and there is skill fading
+    private AlertObserver   alert      = new AlertObserver();
  
     // Left side of UI (list of skills)
     private DefaultListModel<Skill> listModel = new DefaultListModel<>();
@@ -34,6 +38,9 @@ public class FrameUI extends JFrame{
     private JLabel strategyLabel   = new JLabel("-");
     private JLabel messageLabel    = new JLabel("Select a skill from the list.");
     private JButton logBtn         = new JButton("Log Usage Today");
+    private JLabel freshCount    = new JLabel("Fresh: 0");
+    private JLabel fadingCount   = new JLabel("Fading: 0");
+    private JLabel outdatedCount = new JLabel("Outdated: 0");
  
     public FrameUI() {
         // window/frame
@@ -41,6 +48,11 @@ public class FrameUI extends JFrame{
         setSize(700, 450);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        
+        // attach OBSERVERS to the SUBJECT
+        summary = new SummaryObserver(tracker.getSkills());
+        tracker.attach(summary);
+        tracker.attach(alert);
  
         createUI();
         loadDemo();
@@ -93,6 +105,17 @@ public class FrameUI extends JFrame{
         detail.add(btnRow);
  
         add(detail, BorderLayout.CENTER);
+        
+        // bottom (summary) 
+        JPanel bottomBar = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 6));
+        bottomBar.setBorder(BorderFactory.createTitledBorder("Summary"));
+        freshCount.setForeground(new Color(39, 174, 96));
+        fadingCount.setForeground(new Color(200, 120, 0));
+        outdatedCount.setForeground(new Color(192, 57, 43));
+        bottomBar.add(freshCount);
+        bottomBar.add(fadingCount);
+        bottomBar.add(outdatedCount);
+        add(bottomBar, BorderLayout.SOUTH);
     }
  
     // method that creates a labeled row used in adding detail to avoid repetition
@@ -130,13 +153,13 @@ public class FrameUI extends JFrame{
             String cat = categoryField.getText().trim();
             if (cat.isEmpty()) cat = "General";
  
-            // ** calss the chosen strategy
+            // ** calss the chosen STRATEGY 
             DecayStrategy strategy = strategyBox.getSelectedIndex() == 0
                     ? new TimeBasedDecay()
                     : new FrequencyBasedDecay();
  
             Skill s = new Skill(name, cat, new SkillEvaluator(strategy));
-            skills.add(s);
+            tracker.addSkill(s); // SUBJECT adds a skill + notifies observers automatic -> by calling update
             refreshList();
             skillList.setSelectedIndex(listModel.size() - 1);
         }
@@ -145,7 +168,8 @@ public class FrameUI extends JFrame{
     // Updates the skill details panel when a skill is clicked
     private void showSkills() {
         Skill s = skillList.getSelectedValue();
-        if (s == null) return;
+        if (s == null)
+            return;
  
         nameLabel.setText(s.getName());
         categoryLabel.setText(s.getCategory());
@@ -161,41 +185,45 @@ public class FrameUI extends JFrame{
     // Called when "Log Usage Today" is clicked
     private void LogUsage() {
         Skill s = skillList.getSelectedValue();
-        if (s == null) return;
-        s.logUsage();
+        if (s == null)
+            return;
+        tracker.logSkillUsage(s); // SUBJECT handles log + notify observers automatic -> by calling update
         refreshList();
         showSkills();
-        JOptionPane.showMessageDialog(this,
-            s.getName() + " logged!\nStatus is now: " + s.getState().getStatus(),
-            "Usage Logged", JOptionPane.INFORMATION_MESSAGE);
+        updateSummaryBar();
     }
  
-    // Rebuilds the list from the skills ArrayList
     private void refreshList() {
         int idx = skillList.getSelectedIndex();
         listModel.clear();
-        for (Skill s : skills) {
-            s.recomputeScore();
+        for (Skill s : tracker.getSkills()) {
             listModel.addElement(s);
         }
         if (idx >= 0 && idx < listModel.size())
             skillList.setSelectedIndex(idx);
+        updateSummaryBar();
     }
  
+    private void updateSummaryBar() {
+        freshCount.setText("Fresh: "    + summary.getFresh());
+        fadingCount.setText("Fading: "  + summary.getFading());
+        outdatedCount.setText("Outdated: " + summary.getOutdated());
+    }
+    
     // 3 pre-loaded demo skills at different decay stages
     private void loadDemo() {
         Skill java = new Skill("Java", "Programming",
                 new SkillEvaluator(new TimeBasedDecay()));
-        skills.add(java);
+        tracker.addSkill(java);
  
         Skill sql = new Skill("SQL", "Database",
                 new SkillEvaluator(new FrequencyBasedDecay()));
         sql.simulateLastUsed(LocalDate.now().minusDays(40), 5);
-        skills.add(sql);
+        tracker.addSkill(sql);
  
         Skill swift = new Skill("Swift", "Mobile",
                 new SkillEvaluator(new TimeBasedDecay()));
         swift.simulateLastUsed(LocalDate.now().minusDays(85), 2);
-        skills.add(swift);
+        tracker.addSkill(swift);
     }
 }
