@@ -15,10 +15,12 @@ import java.util.List;
 // Subject class in the Observer pattern
 // store skill list and notifies observers when skills change 
 public class Subject {
-    
-    private List<Skill>         skills    = new ArrayList<>();
-    private List<SkillObserver> observers = new ArrayList<>();
 
+
+
+        private List<Skill> skills = new ArrayList<>();
+        private List<SkillObserver> observers = new ArrayList<>();
+        private SkillDAO skillDAO = new SkillDAO();
     // Attach observer
     public void attach(SkillObserver observer) {
         observers.add(observer);
@@ -38,7 +40,11 @@ public class Subject {
     
     // Add a skill and notify observers
     public void addSkill(Skill skill) {
+
         skills.add(skill);
+
+        skillDAO.saveSkill(skill);
+
         notifyObservers(skill);
     }
 
