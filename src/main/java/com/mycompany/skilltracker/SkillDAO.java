@@ -34,7 +34,9 @@ public class SkillDAO {
             System.out.println("Skill Saved!");
 
         } catch (Exception e) {
-            e.printStackTrace();
+
+
+            System.out.println("Database not available.");
+        }
         }
     }
-}
