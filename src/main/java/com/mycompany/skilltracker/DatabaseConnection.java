@@ -4,17 +4,19 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+// SINGLETON design pattern (Database connection)
 public class DatabaseConnection {
 
     private static DatabaseConnection instance;
 
     private Connection connection;
 
+    // private constructor
     private DatabaseConnection() {
 
         try {
 
-            String url = "jdbc:mysql://localhost:3306/skilltracker";
+            String url = "jdbc:mysql://localhost:3306/SkillTracker";
             String user = "root";
             String password = "Sss@12345";
 
@@ -28,12 +30,15 @@ public class DatabaseConnection {
         }
     }
 
+    // can only be called by getInstance() method
     public static DatabaseConnection getInstance() {
 
+        // creates only one instance
         if (instance == null) {
             instance = new DatabaseConnection();
         }
 
+        // and uses only this single instance
         return instance;
     }
 
