@@ -7,7 +7,7 @@ public class SkillDB {
 
     private static final String url      = "jdbc:mysql://localhost:3306";
     private static final String username = "root";
-    private static final String password = "Sss@12345";
+    private static final String password = "Mm112233";
 
     public static void setup(){
         try (Connection con = DriverManager.getConnection(url, username, password);

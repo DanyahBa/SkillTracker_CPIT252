@@ -1,0 +1,5 @@
+com\mycompany\skilltracker\SingletonPatternTest.class
+com\mycompany\skilltracker\ObserverPatternTest.class
+com\mycompany\skilltracker\StatePatternTest.class
+org\junit\Test.class
+com\mycompany\skilltracker\StrategyPatternTest.class

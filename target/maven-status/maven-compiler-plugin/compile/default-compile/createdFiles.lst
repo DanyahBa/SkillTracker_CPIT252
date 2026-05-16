@@ -1,6 +1,10 @@
+com\mycompany\skilltracker\SkillQuery.class
 com\mycompany\skilltracker\Subject.class
+com\mycompany\skilltracker\DatabaseConnection.class
 com\mycompany\skilltracker\Skill.class
 com\mycompany\skilltracker\SkillObserver.class
+com\mycompany\skilltracker\SkillDB.class
+com\mycompany\skilltracker\LoginFrame.class
 com\mycompany\skilltracker\SummaryObserver.class
 com\mycompany\skilltracker\FrequencyBasedDecay.class
 com\mycompany\skilltracker\FadingState.class

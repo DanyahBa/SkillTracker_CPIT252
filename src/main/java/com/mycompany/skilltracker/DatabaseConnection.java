@@ -18,7 +18,7 @@ public class DatabaseConnection {
 
             String url = "jdbc:mysql://localhost:3306/SkillTracker";
             String user = "root";
-            String password = "Sss@12345";
+            String password = "Mm112233";
 
             connection = DriverManager.getConnection(url, user, password);
 
